@@ -90,6 +90,7 @@ jobs:
       run: |
         mkdir -p ~/.kube
         echo "$KUBECONFIG" > ~/.kube/config
+        mkdir -p ~/.minikube/profiles/minikube  # Create missing directory
         echo "$MINIKUBE_CLIENT_CERT" > ~/.minikube/profiles/minikube/client.crt
         echo "$MINIKUBE_CLIENT_KEY" > ~/.minikube/profiles/minikube/client.key
         echo "$MINIKUBE_CA_CERT" > ~/.minikube/ca.crt
