@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    #Setting up environment
+    # Setting up environment
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -63,7 +63,7 @@ jobs:
           sed -i "s|image: rg171195/demo-app:.*|image: rg171195/demo-app:${{ env.VERSION }}|g" deploy/deploy.yaml
           cat deploy/deploy.yaml
   
-        # Update Github
+    # Update Github
       - name: Commit the changes
         run: |
           git config --global user.email "<>"
@@ -71,3 +71,26 @@ jobs:
           git add deploy/deploy.yaml
           git commit -m "Update deploy.yaml with new image version - ${{ env.VERSION }}"
           git push origin main
+
+  # New deployment job to Minikube
+  deploy-to-minikube:
+    runs-on: ubuntu-latest
+    needs: build  # Ensure the build job completes first
+
+    steps:
+      # Set up Kubernetes kubeconfig
+      - name: Set up Kubernetes kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+
+      # Deploy the updated image to Minikube
+      - name: Deploy to Minikube
+        run: |
+          kubectl set image deployment/your-deployment-name your-container-name=rg171195/demo-app:${{ env.VERSION }}
+          kubectl rollout status deployment/your-deployment-name
+
+      # Optional: Verify the deployment
+      - name: Verify deployment
+        run: |
+          kubectl get pods
